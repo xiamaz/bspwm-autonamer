@@ -1,0 +1,12 @@
+[Unit]
+Description=Automatically remove bspwm desktop names
+After=xorg.target xcape.service
+
+[Service]
+ExecStart=%h/.local/bin/autoremover.sh
+Type=simple
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
