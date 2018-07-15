@@ -14,6 +14,9 @@ set_name() {
 		Nautilus)
 			name="Files"
 			;;
+		st-256color)
+			name="Terminal"
+			;;
 		*)
 			echo "Class $1 not found" > /tmp/bspc-external-rename
 			return
