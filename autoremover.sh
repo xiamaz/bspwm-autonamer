@@ -31,7 +31,12 @@ swap_nodes() {
 	# remove name from old desktop if now empty
 	reset_desktop_name $1 $2 $3
 	# add name to new desktop if it was empty
-	set_desktop_name $5 $cur_source_name
+	# only set if the name is not numeric
+	case $cur_source_name in
+		''|*[!0-9]*)
+			set_desktop_name $5 $cur_source_name
+			;;
+	esac
 }
 
 bspc subscribe node | while read etype eargs
