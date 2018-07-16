@@ -17,6 +17,9 @@ set_name() {
 		st-256color)
 			name="Terminal"
 			;;
+		keepassxc)
+			name="Keepass"
+			;;
 		*)
 			echo "Class $1 not found" > /tmp/bspc-external-rename
 			return
@@ -31,7 +34,7 @@ instance=$(echo ${3} | xargs)
 # title=$(xtitle "$wid")
 
 # Debug
-echo "$wid $class $instance" > /tmp/bspc-external-rules
+# echo "$wid $class $instance" > /tmp/bspc-external-rules
 
 # name the desktop if it doesnt already have a name
 desktop_name=$(bspc query -D -d --names)
