@@ -20,6 +20,9 @@ set_name() {
 		keepassxc)
 			name="Keepass"
 			;;
+		Remmina)
+			name="RDP"
+			;;
 		*)
 			echo "Class $1 not found" > /tmp/bspc-external-rename
 			return
