@@ -17,9 +17,9 @@ set_name() {
 		st-256color)
 			name="Terminal"
 			;;
-		keepassxc)
-			name="Keepass"
-			;;
+		# keepassxc)
+		# 	name="Keepass"
+		# 	;;
 		*)
 			echo "Class $1 not found" > /tmp/bspc-external-rename
 			return
