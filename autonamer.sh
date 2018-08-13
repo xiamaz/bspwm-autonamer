@@ -17,18 +17,12 @@ set_name() {
 		st-256color)
 			name="Terminal"
 			;;
-<<<<<<< HEAD
 		# keepassxc)
 		# 	name="Keepass"
 		# 	;;
-=======
-		keepassxc)
-			name="Keepass"
-			;;
 		Remmina)
 			name="RDP"
 			;;
->>>>>>> 3e4b21aef90136c224f3c550132f654cb9406375
 		*)
 			echo "Class $1 not found" > /tmp/bspc-external-rename
 			return
