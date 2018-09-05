@@ -17,9 +17,10 @@ set_name() {
 		st-256color)
 			name="Terminal"
 			;;
-		# keepassxc)
-		# 	name="Keepass"
-		# 	;;
+		keepassxc)
+			bspc desktop ^5 -f
+			name="Keepass"
+			;;
 		Remmina)
 			name="RDP"
 			;;

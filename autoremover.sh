@@ -51,8 +51,9 @@ change_nodes() {
 	change_desktops $1 $2 $4 $5
 }
 
-bspc subscribe node | while read etype eargs
+bspc subscribe node desktop | while read etype eargs
 do
+	echo "$etype $eargs" >> /tmp/bspc-autonamer
 	case $etype in
 		# clear desktop name on removal
 		node_remove)
