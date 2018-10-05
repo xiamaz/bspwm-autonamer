@@ -1,8 +1,9 @@
 #!/bin/dash
 
 # Set the desktop name based on the activating window class
-# param1: window class
-# param2 (opt): window id (used for some title lookups)
+# Args:
+# 1 window class
+# 2 window id (used for some title lookups)
 set_name() {
 	case $1 in
 		Firefox)
@@ -16,6 +17,18 @@ set_name() {
 			;;
 		st-256color)
 			name="Terminal"
+			title=$(xprop -id $2 _NET_WM_NAME | grep -Po '(?<= = ")[^"]+')
+			case "$title" in
+				st-main-home-tmux)
+					name="Thinkstation-D20"
+					;;
+				st-main-local-tmux)
+					name="$(hostname)"
+					;;
+				st-ssh-*)
+					name="$(echo $title | grep -Po '(?<=st-ssh-).+')"
+					;;
+			esac
 			;;
 		keepassxc)
 			bspc desktop ^5 -f
