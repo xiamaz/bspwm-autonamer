@@ -7,7 +7,7 @@
 set_name() {
 	case $1 in
 		Firefox)
-			name="Browser"
+			name="Firefox"
 			;;
 		Thunderbird)
 			name="Mail"
@@ -36,6 +36,9 @@ set_name() {
 			;;
 		Remmina)
 			name="RDP"
+			;;
+		Chromium)
+			name="Chromium"
 			;;
 		*)
 			echo "Class $1 not found" > /tmp/bspc-external-rename
