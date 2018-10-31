@@ -1,54 +1,76 @@
 #!/bin/dash
 # script to automatically reset desktop name after last node exited
-
-reset_desktop_name() {
-	monitor=$1
-	desktop=$2
-
-	# check that the desktop is empty before removing name
-	bspc query -N -d $desktop > /dev/null 2>&1
-	if [ $? -eq 1 ]; then
-		desktop_number=$(bspc query -D -m $monitor | grep -no $desktop | cut -d : -f 1)
-		bspc desktop $desktop -n "$desktop_number"
-	fi
+# 1 - monitor
+# 2 - desktop
+desktop_number_name() {
+	desktop_number=$(bspc query -D -m $1 | grep -no $2 | cut -d : -f 1)
+	bspc desktop $2 -n "$desktop_number"
 }
 
 # set name on desktop if it is the only window
-# arg1: desktop id
-# arg2: new desktop name
+# 1 - desktop
+# 2 - desktop_name
 set_desktop_name() {
-	desktop_id=$1
-	new_desktop_name=$2
-	# check that the desktop has only one node
-	if [ $(bspc query -N -n .window -d $desktop_id | wc -l) -eq 1 ]; then
-		bspc desktop $desktop_id -n $new_desktop_name
+	# check if current name is a number
+	cur_name=$(bspc query -D -d $1 --names)
+	case $cur_name in
+	[0-9])
+		bspc desktop $1 -n $2
+		;;
+	esac
+}
+
+# 1 - monitor
+# 2 - desktop
+on_node_remove() {
+	# check that the desktop is empty before removing name
+	bspc query -N -d $2 > /dev/null 2>&1
+	if [ $? -eq 1 ]; then
+		desktop_number_name $1 $2
 	fi
 }
 
-# swap node into a different desktop, check whether the source is now empty
-# args: src_monitor src_desktop dst_monitor dst_desktop
-change_desktops() {
+# node changes uses more unnecessary arguments
+# 1 - src monitor
+# 2 - src desktop
+# 3 - src node id
+# 4 - dst monitor
+# 5 - dst desktop
+# 6 - dst node id
+on_node_transfer() {
 	src_monitor=$1
 	src_desktop=$2
-	dst_monitor=$3
-	dst_desktop=$4
+	dst_monitor=$4
+	dst_desktop=$5
 	# args: src_monitor src_desktop src_node dst_monitor dst_desktop dst_node
-	cur_source_name=$(bspc query -D -d $src_desktop --names)
+	cur_src_name=$(bspc query -D -d $src_desktop --names)
 	# remove name from old desktop if now empty
 	reset_desktop_name $src_monitor $src_desktop
 	# add name to new desktop if it was empty
-	# only set if the name is not numeric
-	case $cur_source_name in
+	case $cur_src_name in
 		''|*[!0-9]*)
 			set_desktop_name $dst_desktop $cur_source_name
 			;;
 	esac
 }
 
-# node changes uses more unnecessary arguments
-change_nodes() {
-	# only use the source and target monitors and desktops
-	change_desktops $1 $2 $4 $5
+# 1 - src monitor
+# 2 - src desktop
+# 3 - dst monitor
+# 4 - dst desktop
+on_desktop_swap() {
+	src_name=$(bspc query -D -d $2 --names)
+	case $src_name in
+	""|[0-9])
+		desktop_number_name $3 $2
+		;;
+	esac
+	dst_name=$(bspc query -D -d $4 --names)
+	case $dst_name in
+	""|[0-9])
+		desktop_number_name $1 $4
+		;;
+	esac
 }
 
 bspc subscribe node desktop | while read etype eargs
@@ -57,13 +79,14 @@ do
 	case $etype in
 		# clear desktop name on removal
 		node_remove)
-			reset_desktop_name $eargs
+			on_node_remove $eargs
 			;;
 		# clear source desktop on moving nodes
 		node_transfer)
-			change_nodes $eargs
+			on_node_transfer $eargs
 			;;
 		desktop_swap)
-			change_desktops $eargs
+			on_desktop_swap $eargs
+			;;
 	esac
 done
