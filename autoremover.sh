@@ -1,11 +1,7 @@
 #!/bin/dash
-# script to automatically reset desktop name after last node exited
-# 1 - monitor
-# 2 - desktop
-desktop_number_name() {
-	desktop_number=$(bspc query -D -m $1 | grep -no $2 | cut -d : -f 1)
-	bspc desktop $2 -n "$desktop_number"
-}
+
+# should be the same as systemd-path user-binaries
+LOCALBIN=$HOME/.local/bin
 
 # set name on desktop if it is the only window
 # 1 - desktop
@@ -20,6 +16,14 @@ set_desktop_name() {
 	esac
 }
 
+# script to automatically reset desktop name after last node exited
+# 1 - monitor
+# 2 - desktop
+desktop_number_name() {
+	desktop_number=$(bspc query -D -m $1 | grep -no $2 | cut -d : -f 1)
+	bspc desktop $2 -n "$desktop_number"
+}
+
 # 1 - monitor
 # 2 - desktop
 on_node_remove() {
@@ -30,6 +34,12 @@ on_node_remove() {
 	fi
 }
 
+# 1 - window id
+get_classname_class() {
+	raw=$(xprop -id $1 WM_CLASS)
+	echo $(echo $raw | cut -d'=' -f 2 | awk -F ', ' '{gsub(/"/, "", $0); print $1 " " $2}')
+}
+
 # node changes uses more unnecessary arguments
 # 1 - src monitor
 # 2 - src desktop
@@ -38,20 +48,14 @@ on_node_remove() {
 # 5 - dst desktop
 # 6 - dst node id
 on_node_transfer() {
-	src_monitor=$1
-	src_desktop=$2
-	dst_monitor=$4
-	dst_desktop=$5
-	# args: src_monitor src_desktop src_node dst_monitor dst_desktop dst_node
-	cur_src_name=$(bspc query -D -d $src_desktop --names)
 	# remove name from old desktop if now empty
-	reset_desktop_name $src_monitor $src_desktop
-	# add name to new desktop if it was empty
-	case $cur_src_name in
-		''|*[!0-9]*)
-			set_desktop_name $dst_desktop $cur_source_name
-			;;
-	esac
+	cur_src_name=$(bspc query -D -d $2 --names)
+	cur_dst_name=$(bspc query -D -d $5 --names)
+	# only transfer name if the src name was a real string label
+	classname_class=$(get_classname_class $3)
+	new_desktop_name=$($LOCALBIN/program_to_desktop_name.sh $3 $classname_class)
+	set_desktop_name $5 $new_desktop_name
+	on_node_remove $1 $2
 }
 
 # 1 - src monitor
