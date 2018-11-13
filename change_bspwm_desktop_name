@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+	cur_name=$(bspc query -D -d --names)
+	bspc desktop -n $(rofi -dmenu -lines 0 -input /dev/null -p "Rename $cur_name")
+elif [ "$1" = "focused" ]; then
+	wid=$(bspc query -N -n)
+	if [ -n "$wid" ]; then
+		# get the default program desktop name
+		echo "wid"
+		progname=$($HOME/.local/bin/program_to_desktop_name.sh $wid)
+	else
+		# get the current desktop number
+		progname=$(bspc query -D -m | grep -no $(bspc query -D -d) | cut -d : -f 1)
+	fi
+	bspc desktop -n "$progname"
+fi

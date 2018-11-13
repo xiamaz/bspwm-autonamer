@@ -48,4 +48,18 @@ set_name() {
 	echo "$name"
 }
 
-set_name "$1" "$2" "$3"
+
+# Args:
+# 1 window id
+get_classname_class() {
+	raw=$(xprop -id $1 WM_CLASS)
+	echo $(echo $raw | cut -d'=' -f 2 | awk -F ', ' '{gsub(/"/, "", $0); print $1 " " $2}')
+}
+
+if [ $# -eq 3 ]; then
+	set_name "$1" "$2" "$3"
+elif [ $# -eq 1 ]; then
+	set_name "$1" $(get_classname_class "$1")
+else
+	echo "Args: WID (CLASSNAME CLASS)"
+fi
