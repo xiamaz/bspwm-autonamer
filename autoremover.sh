@@ -34,12 +34,6 @@ on_node_remove() {
 	fi
 }
 
-# 1 - window id
-get_classname_class() {
-	raw=$(xprop -id $1 WM_CLASS)
-	echo $(echo $raw | cut -d'=' -f 2 | awk -F ', ' '{gsub(/"/, "", $0); print $1 " " $2}')
-}
-
 # node changes uses more unnecessary arguments
 # 1 - src monitor
 # 2 - src desktop
@@ -52,8 +46,7 @@ on_node_transfer() {
 	cur_src_name=$(bspc query -D -d $2 --names)
 	cur_dst_name=$(bspc query -D -d $5 --names)
 	# only transfer name if the src name was a real string label
-	classname_class=$(get_classname_class $3)
-	new_desktop_name=$($LOCALBIN/program_to_desktop_name.sh $3 $classname_class)
+	new_desktop_name=$($LOCALBIN/program_to_desktop_name.sh $3)
 	set_desktop_name $5 $new_desktop_name
 	on_node_remove $1 $2
 }
